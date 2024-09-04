@@ -25,11 +25,15 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y gcc make bc bison flex libssl-dev libncurses5-dev libelf-dev
 
-    - name: Prepare Kernel Config
+    - name: Set Default Configuration for LITTLE_CPU_MASK and BIG_CPU_MASK
       run: |
         echo 'CONFIG_LITTLE_CPU_MASK="0x3"' >> arch/arm64/configs/mt6785_defconfig
         echo 'CONFIG_BIG_CPU_MASK="0xC"' >> arch/arm64/configs/mt6785_defconfig
+
+    - name: Apply Kernel Configuration
+      run: |
         make O=out ARCH=arm64 defconfig
+        scripts/kconfig/conf --olddefconfig arch/arm64/configs/mt6785_defconfig
 
     - name: Build Kernel
       run: |
