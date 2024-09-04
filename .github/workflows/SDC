@@ -1,0 +1,42 @@
+name: Build Kernel
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout source
+      uses: actions/checkout@v2
+      with:
+        repository: HarshitX97/kernel_xiaomi_mt6785ER
+        ref: derp
+        fetch-depth: 0
+
+    - name: Set up custom compiler
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y gcc make bc bison flex libssl-dev libncurses5-dev libelf-dev
+
+    - name: Prepare Kernel Config
+      run: |
+        echo 'CONFIG_LITTLE_CPU_MASK="0x3"' >> arch/arm64/configs/mt6785_defconfig
+        echo 'CONFIG_BIG_CPU_MASK="0xC"' >> arch/arm64/configs/mt6785_defconfig
+        make O=out ARCH=arm64 defconfig
+
+    - name: Build Kernel
+      run: |
+        make -j$(nproc) O=out ARCH=arm64
+
+    - name: Upload Kernel
+      uses: actions/upload-artifact@v2
+      with:
+        name: kernel
+        path: out/arch/arm64/boot/Image.gz-dtb
