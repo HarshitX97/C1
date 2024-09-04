@@ -18,7 +18,7 @@ jobs:
       with:
         repository: HarshitX97/kernel_xiaomi_mt6785ER
         ref: main
-        token: ${{ secrets.GITHUB_TOKEN }}
+        fetch-depth: 0
 
     - name: Set up custom compiler
       run: |
